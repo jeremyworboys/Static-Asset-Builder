@@ -50,7 +50,7 @@ jpegoptim          = /usr/local/bin/jpegoptim
 # Build binary options
 ifeq ($(PRODUCTION),1)
 uglify-opts        = --mangle --compress
-stylus-opts        = --use $(nib) --import nib --compress
+stylus-opts        = --use $(nib) --import nib
 pngout-opts        = -s0 -n1 -f0
 pngnq-opts         = -s1
 jpegoptim-opts     = --strip-all
