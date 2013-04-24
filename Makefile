@@ -42,6 +42,7 @@ cat                = /bin/cat
 uglifyjs           = ./node_modules/uglify-js/bin/uglifyjs
 stylus             = ./node_modules/stylus/bin/stylus
 nib                = ./node_modules/nib/lib/nib.js
+cssmin             = ./node_modules/cssmin/bin/cssmin
 pngout             = /usr/local/bin/pngout
 pngnq              = /usr/local/bin/pngnq
 jpegoptim          = /usr/local/bin/jpegoptim
@@ -86,6 +87,9 @@ $(stylus):
 
 $(nib):
 	npm install nib
+
+$(cssmin):
+	npm install cssmin
 
 $(pngout):
 	$(error You need to install pngout manually. Get the binary from http://www.jonof.id.au/kenutils)
@@ -134,7 +138,11 @@ styles: $(target-styles)
 
 # Actual build step
 $(target-styles): $(tmp-files)
+ifeq ($(PRODUCTION),1)
+	$(cat) $+ | $(cssmin) > $@
+else
 	$(cat) $+ > $@
+endif
 	rm -rf $(build-tmp)
 
 $(build-tmp):
