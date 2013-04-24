@@ -137,7 +137,7 @@ fix-imports   = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(sr
 styles: $(target-styles)
 
 # Actual build step
-$(target-styles): $(tmp-files)
+$(target-styles): $(tmp-files) $(cssmin)
 ifeq ($(PRODUCTION),1)
 	$(cat) $+ | $(cssmin) > $@
 else
@@ -148,7 +148,7 @@ endif
 $(build-tmp):
 	mkdir -p $@
 
-$(build-tmp)/%.css.css: $(src-styles-dir)/%.css $(build-tmp) $(stylus)
+$(build-tmp)/%.css.css: $(src-styles-dir)/%.css $(build-tmp)
 	$(cat) $< > $@
 
 $(build-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-tmp) $(stylus)
