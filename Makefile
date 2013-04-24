@@ -148,6 +148,9 @@ endif
 $(build-tmp):
 	mkdir -p $@
 
+$(build-tmp)/%.css.css: $(src-styles-dir)/%.css $(build-tmp) $(stylus)
+	$(cat) $< > $@
+
 $(build-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-tmp) $(stylus)
 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
 
