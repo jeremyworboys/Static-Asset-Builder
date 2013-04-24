@@ -38,9 +38,10 @@ src-images-dir     = $(src-dir)/images
 target-images-dir  = $(build-dir)/images
 
 # Binary locations
-nib                = $(CURDIR)/node_modules/nib/lib/nib.js
-uglifyjs           = $(CURDIR)/node_modules/uglify-js/bin/uglifyjs
-stylus             = $(CURDIR)/node_modules/stylus/bin/stylus
+cat                = /bin/cat
+uglifyjs           = ./node_modules/uglify-js/bin/uglifyjs
+stylus             = ./node_modules/stylus/bin/stylus
+nib                = ./node_modules/nib/lib/nib.js
 pngout             = /usr/local/bin/pngout
 pngnq              = /usr/local/bin/pngnq
 jpegoptim          = /usr/local/bin/jpegoptim
@@ -123,14 +124,24 @@ $(target-script):  $(wildcard $(src-scripts-dir)/*) $(uglifyjs) $(build-dir)
 
 src-styles    = $(addprefix $(src-styles-dir)/,$(src-styles-order))
 target-styles = $(build-dir)/$(target-name).css
+build-tmp     = $(build-dir)/css-tmp
+tmp-files     = $(addprefix $(build-tmp)/,$(addsuffix .css,$(src-styles-order)))
+
+fix-imports   = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(src-styles-dir))\/\2\3/g"
 
 # Convenience alias
 styles: $(target-styles)
 
 # Actual build step
-$(target-styles): $(wildcard $(src-styles-dir)/*) $(stylus) $(nib) $(build-dir)
-	cd $(src-styles-dir); \
-	$(stylus) $(stylus-opts) < $(notdir $(src-styles)) > $(CURDIR)/$(target-styles)
+$(target-styles): $(tmp-files)
+	$(cat) $+ > $@
+	rm -rf $(build-tmp)
+
+$(build-tmp):
+	mkdir -p $@
+
+$(build-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-tmp) $(stylus)
+	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
 
 
 
