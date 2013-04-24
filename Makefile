@@ -64,20 +64,33 @@ endif
 
 
 
-
 # ------------------------------------------------------------------------------
 # GENERIC
 # ------------------------------------------------------------------------------
+.PHONY: all clean scripts styles fonts images
 
-# Default build
+#
+# Compile all assets
+#
 all: scripts styles fonts images
 
-# Clean-up previous builds
+#
+# Create target build directory
+#
+$(build-dir):
+	mkdir -p $@
+
+#
+# Clean-up previous build
+#
 clean:
 	rm -rf $(build-dir)
 
-# Install binaries
-install: $(uglifyjs) $(stylus) $(nib) $(optipng) $(jpegtran)
+
+
+# ------------------------------------------------------------------------------
+# BINARIES
+# ------------------------------------------------------------------------------
 
 $(uglifyjs):
 	npm install uglify-js
@@ -100,10 +113,6 @@ $(pngnq):
 $(jpegoptim):
 	brew install jpegoptim
 
-# Create bulid directory
-$(build-dir):
-	mkdir -p $@
-
 
 
 # ------------------------------------------------------------------------------
@@ -112,13 +121,35 @@ $(build-dir):
 
 src-scripts   = $(addprefix $(src-scripts-dir)/,$(src-scripts-order))
 target-script = $(build-dir)/$(target-name).js
+build-js-tmp  = $(build-dir)/js-tmp
+tmp-js-files  = $(addprefix $(build-js-tmp)/,$(addsuffix .js,$(src-scripts-order)))
 
-# Convenience alias
-scripts: $(target-script)
+scripts: $(uglifyjs) $(build-dir) $(target-script)
 
-# Actual build step
-$(target-script):  $(wildcard $(src-scripts-dir)/*) $(uglifyjs) $(build-dir)
-	$(uglifyjs) $< $(uglify-opts) --output $@ --source-map $@.map --source-map-url /$@.map --source-map-root /
+#
+# Concatenate and compress intermediate JS files
+#
+$(target-script): $(tmp-js-files)
+	$(uglifyjs) $+ $(uglify-opts) --output $@ --source-map $@.map --source-map-url /$@.map --source-map-root /
+	rm -rf $(build-js-tmp)
+
+#
+# Create directory for intermediate JS files
+#
+$(build-js-tmp):
+	mkdir -p $@
+
+#
+# Copy source JS files
+#
+$(build-js-tmp)/%.js.js: $(src-scripts-dir)/%.js $(build-js-tmp)
+	$(cat) $< > $@
+
+#
+# Compile source Coffeescript files
+#
+# $(build-js-tmp)/%.styl.js: $(src-scripts-dir)/%.styl $(build-js-tmp) $(stylus)
+# 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
 
 
 
@@ -128,30 +159,40 @@ $(target-script):  $(wildcard $(src-scripts-dir)/*) $(uglifyjs) $(build-dir)
 
 src-styles    = $(addprefix $(src-styles-dir)/,$(src-styles-order))
 target-styles = $(build-dir)/$(target-name).css
-build-tmp     = $(build-dir)/css-tmp
-tmp-files     = $(addprefix $(build-tmp)/,$(addsuffix .css,$(src-styles-order)))
+build-css-tmp = $(build-dir)/css-tmp
+tmp-css-files = $(addprefix $(build-css-tmp)/,$(addsuffix .css,$(src-styles-order)))
 
 fix-imports   = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(src-styles-dir))\/\2\3/g"
 
-# Convenience alias
-styles: $(target-styles)
+styles: $(cssmin) $(build-dir) $(target-styles)
 
-# Actual build step
-$(target-styles): $(tmp-files) $(cssmin)
+#
+# Concatenate and compress intermediate CSS files
+#
+$(target-styles): $(tmp-css-files)
 ifeq ($(PRODUCTION),1)
 	$(cat) $+ | $(cssmin) > $@
 else
 	$(cat) $+ > $@
 endif
-	rm -rf $(build-tmp)
+	rm -rf $(build-css-tmp)
 
-$(build-tmp):
+#
+# Create directory for intermediate CSS files
+#
+$(build-css-tmp):
 	mkdir -p $@
 
-$(build-tmp)/%.css.css: $(src-styles-dir)/%.css $(build-tmp)
+#
+# Copy source CSS files
+#
+$(build-css-tmp)/%.css.css: $(src-styles-dir)/%.css $(build-css-tmp)
 	$(cat) $< > $@
 
-$(build-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-tmp) $(stylus)
+#
+# Compile source Stylus files
+#
+$(build-css-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-css-tmp) $(stylus)
 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
 
 
@@ -163,15 +204,19 @@ $(build-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-tmp) $(stylus)
 src-fonts    = $(wildcard $(src-fonts-dir)/*)
 target-fonts = $(addprefix $(target-fonts-dir)/,$(notdir $(src-fonts)))
 
-# Convenience alias
 fonts: $(target-fonts)
 
-# Actual build step
-$(target-fonts-dir):
-	mkdir -p $(target-fonts-dir)
-
+#
+# Move source fonts to target directory
+#
 $(target-fonts): $(src-fonts) $(target-fonts-dir)
 	cp $< $@
+
+#
+# Create target directory for fonts
+#
+$(target-fonts-dir):
+	mkdir -p $(target-fonts-dir)
 
 
 
@@ -184,22 +229,29 @@ jpg-suffix    = %.jpg %.jpeg
 src-images    = $(wildcard $(src-images-dir)/*)
 target-images = $(addprefix $(target-images-dir)/,$(notdir $(src-images)))
 
-# Convenience alias
 images: $(target-images)
 
-# Actual build step
-$(target-images-dir):
-	mkdir -p $(target-images-dir)
-
+#
+# Optimise and compress PNG images
+#
 $(filter $(png-suffix),$(target-images)): $(filter $(png-suffix),$(src-images)) $(pngout) $(pngnq) $(target-images-dir)
 	$(pngnq) $(pngnq-opts) -f -d $(target-images-dir) -e .png $<
 	$(pngout) $@ $(pngout-opts) -y -q; exit 0
 
+#
+# Optimise and compress JPG images
+#
 $(filter $(jpg-suffix),$(target-images)): $(filter $(jpg-suffix),$(src-images)) $(jpegoptim) $(target-images-dir)
 	$(jpegoptim) $(jpegoptim-opts) -o -q -d $(target-images-dir) $<
 
+#
+# Copy remaining source images into target directory
+#
 $(filter-out $(png-suffix) $(jpg-suffix),$(target-images)): $(filter-out $(png-suffix) $(jpg-suffix),$(src-images)) $(target-images-dir)
 	cp $< $@
 
-
-.PHONY: all clean install uninstall scripts styles fonts images
+#
+# Create target directory for images
+#
+$(target-images-dir):
+	mkdir -p $(target-images-dir)
