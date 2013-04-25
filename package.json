@@ -1,0 +1,10 @@
+{
+  "name": "Makefile",
+  "description": "Web development Makefile for asset optimisation",
+  "version": "0.0.1",
+  "author": "Jeremy Worboys <jw@jeremyworboys.com>",
+  "devDependencies": {
+    "chai": "~1.5.0",
+    "mocha": "~1.9.0"
+  }
+}
