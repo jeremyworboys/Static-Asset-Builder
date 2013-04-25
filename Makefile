@@ -224,30 +224,30 @@ $(target-fonts-dir):
 # IMAGES
 # ------------------------------------------------------------------------------
 
-png-suffix    = %.png %.bmp %.gif %.pnm %.tiff
-jpg-suffix    = %.jpg %.jpeg
-src-images    = $(wildcard $(src-images-dir)/*)
-target-images = $(addprefix $(target-images-dir)/,$(notdir $(src-images)))
+# TODO: Multi-suffix rules
+# png-suffix = %.png %.bmp %.gif %.pnm %.tiff
+# jpg-suffix = %.jpg %.jpeg
 
-images: $(target-images)
+images: $(addprefix $(target-images-dir)/,$(notdir $(wildcard $(src-images-dir)/*)))
 
 #
 # Optimise and compress PNG images
 #
-$(filter $(png-suffix),$(target-images)): $(filter $(png-suffix),$(src-images)) $(pngout) $(pngnq) $(target-images-dir)
+$(target-images-dir)/%.png: $(src-images-dir)/%.png $(pngout) $(pngnq) $(target-images-dir)
 	$(pngnq) $(pngnq-opts) -f -d $(target-images-dir) -e .png $<
 	$(pngout) $@ $(pngout-opts) -y -q; exit 0
 
 #
 # Optimise and compress JPG images
 #
-$(filter $(jpg-suffix),$(target-images)): $(filter $(jpg-suffix),$(src-images)) $(jpegoptim) $(target-images-dir)
+$(target-images-dir)/%.jpg: $(src-images-dir)/%.jpg $(jpegoptim) $(target-images-dir)
 	$(jpegoptim) $(jpegoptim-opts) -o -q -d $(target-images-dir) $<
 
 #
 # Copy remaining source images into target directory
+# This rule comes last because rules are top down
 #
-$(filter-out $(png-suffix) $(jpg-suffix),$(target-images)): $(filter-out $(png-suffix) $(jpg-suffix),$(src-images)) $(target-images-dir)
+$(target-images-dir)/%: $(src-images-dir)/% $(target-images-dir)
 	cp $< $@
 
 #
