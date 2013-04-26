@@ -16,7 +16,7 @@ describe('Makefile', function() {
         it('should optimise scripts with uglify-js', function(done) {
             test('scripts', 'scripts scripts-order="include.js main.js"', function(err, stdout) {
                 if (err) return done(err);
-                stdout.should.include('uglifyjs build/.js/include.js build/.js/main.js  --output build/make.js');
+                stdout.should.include('uglifyjs');
                 done();
             });
         });
@@ -36,8 +36,7 @@ describe('Makefile', function() {
             it('should copy all files to the temp directory', function(done) {
                 test('scripts', 'scripts scripts-order="include.js main.js"', function(err, stdout) {
                     if (err) return done(err);
-                    stdout.should.include('cp lib/scripts/include.js build/.js/include.js');
-                    stdout.should.include('cp lib/scripts/main.js build/.js/main.js');
+                    stdout.should.include('cp lib/scripts');
                     done();
                 });
             });
@@ -58,8 +57,7 @@ describe('Makefile', function() {
         it('should copy all fonts to the build directory', function(done) {
             test('fonts', 'fonts', function(err, stdout) {
                 if (err) return done(err);
-                stdout.should.include('cp lib/fonts/font.eot build/fonts/font.eot');
-                stdout.should.include('cp lib/fonts/font.ttf build/fonts/font.ttf');
+                stdout.should.include('cp lib/fonts');
                 done();
             });
         });
@@ -89,8 +87,7 @@ describe('Makefile', function() {
             it('should optimise images with pngnq', function(done) {
                 test('images-png', 'images', function(err, stdout) {
                     if (err) return done(err);
-                    stdout.should.include('pngnq -s10 -f -d build/images -e .png lib/images/image-1.png');
-                    stdout.should.include('pngnq -s10 -f -d build/images -e .png lib/images/image-2.png');
+                    stdout.should.include('pngnq');
                     done();
                 });
             });
@@ -98,8 +95,7 @@ describe('Makefile', function() {
             it('should compress images with pngout', function(done) {
                 test('images-png', 'images', function(err, stdout) {
                     if (err) return done(err);
-                    stdout.should.include('pngout build/images/image-1.png');
-                    stdout.should.include('pngout build/images/image-2.png');
+                    stdout.should.include('pngout');
                     done();
                 });
             });
@@ -120,8 +116,7 @@ describe('Makefile', function() {
             it('should compress images with jpegoptim', function(done) {
                 test('images-jpg', 'images', function(err, stdout) {
                     if (err) return done(err);
-                    stdout.should.include('jpegoptim  -o -q -d build/images lib/images/image-1.jpg');
-                    stdout.should.include('jpegoptim  -o -q -d build/images lib/images/image-2.jpg');
+                    stdout.should.include('jpegoptim');
                     done();
                 });
             });
@@ -142,8 +137,7 @@ describe('Makefile', function() {
             it('should copy all images to the build directory', function(done) {
                 test('images-gif', 'images', function(err, stdout) {
                     if (err) return done(err);
-                    stdout.should.include('cp lib/images/image-1.gif build/images/image-1.gif');
-                    stdout.should.include('cp lib/images/image-2.gif build/images/image-2.gif');
+                    stdout.should.include('cp lib/images');
                     done();
                 });
             });
@@ -164,12 +158,10 @@ describe('Makefile', function() {
             it('should copy all images to the build directory', function(done) {
                 test('images-all', 'images', function(err, stdout) {
                     if (err) return done(err);
-                    stdout.should.include('cp lib/images/image-1.gif build/images/image-1.gif');
-                    stdout.should.include('cp lib/images/image-2.gif build/images/image-2.gif');
-                    stdout.should.include('jpegoptim  -o -q -d build/images lib/images/image-1.jpg');
-                    stdout.should.include('jpegoptim  -o -q -d build/images lib/images/image-2.jpg');
-                    stdout.should.include('pngnq -s10 -f -d build/images -e .png lib/images/image-1.png');
-                    stdout.should.include('pngnq -s10 -f -d build/images -e .png lib/images/image-2.png');
+                    stdout.should.include('cp lib/images');
+                    stdout.should.include('jpegoptim');
+                    stdout.should.include('pngnq');
+                    stdout.should.include('pngout');
                     done();
                 });
             });
