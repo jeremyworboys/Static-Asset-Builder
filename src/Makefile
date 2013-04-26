@@ -123,13 +123,13 @@ scripts: $(build-dir)/$(target-name).js $(uglifyjs)
 #
 # Concatenate and compress intermediate JS files
 #
-$(build-dir)/$(target-name).js: $(addprefix $(build-dir)/.js/,$(addsuffix .js,$(basename $(scripts-order))))
+$(build-dir)/$(target-name).js: $(addprefix $(build-dir)/.js/,$(addsuffix .js,$(scripts-order)))
 	$(uglifyjs) $+ $(uglify-opts) --output $@ --source-map $@.map --source-map-url /$@.map --source-map-root /
 
 #
 # Copy source JS files
 #
-$(build-dir)/.js/%.js: $(src-dir)/$(scripts-dir)/%.js $(build-dir)/.js
+$(build-dir)/.js/%.js.js: $(src-dir)/$(scripts-dir)/%.js $(build-dir)/.js
 	cp $< $@
 
 #
