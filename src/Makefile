@@ -33,8 +33,7 @@ src-styles-order   = main.styl
 fonts-dir          = fonts
 
 # Images
-src-images-dir     = $(src-dir)/images
-target-images-dir  = $(build-dir)/images
+images-dir         = images
 
 # Binary locations
 cat                = /bin/cat
@@ -224,30 +223,30 @@ $(build-dir)/$(fonts-dir):
 # png-suffix = %.png %.bmp %.gif %.pnm %.tiff
 # jpg-suffix = %.jpg %.jpeg
 
-images: $(addprefix $(target-images-dir)/,$(notdir $(wildcard $(src-images-dir)/*)))
+images: $(subst $(src-dir),$(build-dir),$(wildcard $(src-dir)/$(images-dir)/*))
 
 #
 # Optimise and compress PNG images
 #
-$(target-images-dir)/%.png: $(src-images-dir)/%.png $(pngout) $(pngnq) $(target-images-dir)
-	$(pngnq) $(pngnq-opts) -f -d $(target-images-dir) -e .png $<
+$(build-dir)/$(images-dir)/%.png: $(src-dir)/$(images-dir)/%.png $(pngout) $(pngnq) $(build-dir)/$(images-dir)
+	$(pngnq) $(pngnq-opts) -f -d $(build-dir)/$(images-dir) -e .png $<
 	$(pngout) $@ $(pngout-opts) -y -q; exit 0
 
 #
 # Optimise and compress JPG images
 #
-$(target-images-dir)/%.jpg: $(src-images-dir)/%.jpg $(jpegoptim) $(target-images-dir)
-	$(jpegoptim) $(jpegoptim-opts) -o -q -d $(target-images-dir) $<
+$(build-dir)/$(images-dir)/%.jpg: $(src-dir)/$(images-dir)/%.jpg $(jpegoptim) $(build-dir)/$(images-dir)
+	$(jpegoptim) $(jpegoptim-opts) -o -q -d $(build-dir)/$(images-dir) $<
 
 #
 # Copy remaining source images into target directory
 # This rule comes last because rules are top down
 #
-$(target-images-dir)/%: $(src-images-dir)/% $(target-images-dir)
+$(build-dir)/$(images-dir)/%: $(src-dir)/$(images-dir)/% $(build-dir)/$(images-dir)
 	cp $< $@
 
 #
 # Create target directory for images
 #
-$(target-images-dir):
-	mkdir -p $(target-images-dir)
+$(build-dir)/$(images-dir):
+	mkdir -p $(build-dir)/$(images-dir)
