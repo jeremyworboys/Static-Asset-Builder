@@ -31,6 +31,17 @@ describe('Makefile', function() {
                 });
             });
         });
+
+        describe('JavaScript', function(done) {
+            it('should copy all files to the temp directory', function(done) {
+                test('scripts', 'scripts src-scripts-order="include.js main.js"', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('cp lib/scripts/include.js build/.js/include.js');
+                    stdout.should.include('cp lib/scripts/main.js build/.js/main.js');
+                    done();
+                });
+            });
+        });
     });
 
     describe('Styles', function() {});
