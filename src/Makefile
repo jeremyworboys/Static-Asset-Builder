@@ -144,7 +144,7 @@ $(build-dir)/.js:
 # STYLES
 # ------------------------------------------------------------------------------
 
-fix-imports = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(styles-dir))\/\2\3/g"
+fix-imports = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(src-dir)/$(styles-dir))\/\2\3/g"
 
 styles: $(build-dir)/$(target-name).css $(cssmin)
 
@@ -197,10 +197,6 @@ $(build-dir)/$(fonts-dir):
 # ------------------------------------------------------------------------------
 # IMAGES
 # ------------------------------------------------------------------------------
-
-# TODO: Multi-suffix rules
-# png-suffix = %.png %.bmp %.gif %.pnm %.tiff
-# jpg-suffix = %.jpg %.jpeg
 
 images: $(subst $(src-dir),$(build-dir),$(wildcard $(src-dir)/$(images-dir)/*))
 
