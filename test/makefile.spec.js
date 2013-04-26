@@ -14,17 +14,17 @@ describe('Makefile', function() {
         });
 
         it('should optimise scripts with uglify-js', function(done) {
-            test('scripts', 'scripts', function(err, stdout) {
+            test('scripts', 'scripts src-scripts-order="include.js main.js"', function(err, stdout) {
                 if (err) return done(err);
-                stdout.should.include('cp lib/scripts/main.js build/.js/main.js');
+                stdout.should.include('uglifyjs build/.js/include.js build/.js/main.js  --output build/make.js');
                 done();
             });
         });
 
         it('should not rebuild up-to-date rules', function(done) {
-            test('scripts', 'scripts', function(err) {
+            test('scripts', 'scripts src-scripts-order="include.js main.js"', function(err) {
                 if (err) return done(err);
-                test(false, 'scripts', function(err, stdout) {
+                test(false, 'scripts src-scripts-order="include.js main.js"', function(err, stdout) {
                     if (err) return done(err);
                     stdout.should.include('Nothing to be done');
                     done();
