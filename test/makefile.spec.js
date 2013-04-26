@@ -4,7 +4,34 @@ var exec = require('child_process').exec;
 
 describe('Makefile', function() {
 
-    describe('Scripts', function() {});
+    describe('Scripts', function() {
+        it('should create the temp directory', function(done) {
+            test('scripts', 'scripts', function(err, stdout) {
+                if (err) return done(err);
+                stdout.should.include('mkdir -p build/.js');
+                done();
+            });
+        });
+
+        it('should optimise scripts with uglify-js', function(done) {
+            test('scripts', 'scripts', function(err, stdout) {
+                if (err) return done(err);
+                stdout.should.include('cp lib/scripts/main.js build/.js/main.js');
+                done();
+            });
+        });
+
+        it('should not rebuild up-to-date rules', function(done) {
+            test('scripts', 'scripts', function(err) {
+                if (err) return done(err);
+                test(false, 'scripts', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('Nothing to be done');
+                    done();
+                });
+            });
+        });
+    });
 
     describe('Styles', function() {});
 
@@ -164,7 +191,7 @@ describe('Makefile', function() {
 function test(example, rule, done) {
     var cmd = [
         'cd tmp',
-        'make '+rule
+        'make node_modules=../node_modules '+rule
     ];
     if (example) cmd.unshift('cp -r examples/'+example+' tmp/lib');
     exec(cmd.join(' && '), done);

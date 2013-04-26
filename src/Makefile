@@ -36,11 +36,12 @@ fonts-dir          = fonts
 images-dir         = images
 
 # Binary locations
+node_modules       = ./node_modules
 cat                = /bin/cat
-uglifyjs           = ./node_modules/uglify-js/bin/uglifyjs
-stylus             = ./node_modules/stylus/bin/stylus
-nib                = ./node_modules/nib/lib/nib.js
-cssmin             = ./node_modules/cssmin/bin/cssmin
+uglifyjs           = $(node_modules)/.bin/uglifyjs
+stylus             = $(node_modules)/.bin/stylus
+nib                = $(node_modules)/nib/lib/nib.js
+cssmin             = $(node_modules)/.bin/cssmin
 pngout             = /usr/local/bin/pngout
 pngnq              = /usr/local/bin/pngnq
 jpegoptim          = /usr/local/bin/jpegoptim
@@ -119,7 +120,7 @@ $(jpegoptim):
 
 src-scripts   = $(addprefix $(src-scripts-dir)/,$(src-scripts-order))
 target-script = $(build-dir)/$(target-name).js
-build-js-tmp  = $(build-dir)/js-tmp
+build-js-tmp  = $(build-dir)/.js
 tmp-js-files  = $(addprefix $(build-js-tmp)/,$(addsuffix .js,$(src-scripts-order)))
 
 scripts: $(uglifyjs) $(build-dir) $(target-script)
@@ -129,7 +130,6 @@ scripts: $(uglifyjs) $(build-dir) $(target-script)
 #
 $(target-script): $(tmp-js-files)
 	$(uglifyjs) $+ $(uglify-opts) --output $@ --source-map $@.map --source-map-url /$@.map --source-map-root /
-	rm -rf $(build-js-tmp)
 
 #
 # Create directory for intermediate JS files
@@ -141,7 +141,7 @@ $(build-js-tmp):
 # Copy source JS files
 #
 $(build-js-tmp)/%.js.js: $(src-scripts-dir)/%.js $(build-js-tmp)
-	$(cat) $< > $@
+	cp $< $@
 
 #
 # Compile source Coffeescript files
