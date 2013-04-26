@@ -30,8 +30,7 @@ src-styles-dir     = $(src-dir)/styles
 src-styles-order   = main.styl
 
 # Fonts
-src-fonts-dir      = $(src-dir)/fonts
-target-fonts-dir   = $(build-dir)/fonts
+fonts-dir          = fonts
 
 # Images
 src-images-dir     = $(src-dir)/images
@@ -201,21 +200,19 @@ $(build-css-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-css-tmp) $(stylus)
 # FONTS
 # ------------------------------------------------------------------------------
 
-target-fonts = $(addprefix $(target-fonts-dir)/,$(notdir $(wildcard $(src-fonts-dir)/*)))
-
-fonts: $(target-fonts)
+fonts: $(subst $(src-dir),$(build-dir),$(wildcard $(src-dir)/$(fonts-dir)/*))
 
 #
 # Move source fonts to target directory
 #
-$(target-fonts-dir)/%: $(src-fonts-dir)/% $(target-fonts-dir)
+$(build-dir)/$(fonts-dir)/%: $(src-dir)/$(fonts-dir)/% $(build-dir)/$(fonts-dir)
 	cp $< $@
 
 #
 # Create target directory for fonts
 #
-$(target-fonts-dir):
-	mkdir -p $(target-fonts-dir)
+$(build-dir)/$(fonts-dir):
+	mkdir -p $(build-dir)/$(fonts-dir)
 
 
 
