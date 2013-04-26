@@ -43,7 +43,45 @@ describe('Makefile', function() {
         });
     });
 
-    describe('Styles', function() {});
+    describe('Styles', function() {
+        it('should create the temp directory', function(done) {
+            test('styles', 'styles', function(err, stdout) {
+                if (err) return done(err);
+                stdout.should.include('mkdir -p build/.css');
+                done();
+            });
+        });
+
+        it('should concatenate and minify styles with cssmin', function(done) {
+            test('styles', 'styles styles-order="include.css main.css"', function(err, stdout) {
+                if (err) return done(err);
+                stdout.should.include('cat');
+                stdout.should.include('cssmin');
+                done();
+            });
+        });
+
+        it('should not rebuild up-to-date rules', function(done) {
+            test('styles', 'styles styles-order="include.css main.css"', function(err) {
+                if (err) return done(err);
+                test(false, 'styles styles-order="include.css main.css"', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('Nothing to be done');
+                    done();
+                });
+            });
+        });
+
+        describe('JavaScript', function(done) {
+            it('should copy all files to the temp directory', function(done) {
+                test('styles', 'styles styles-order="include.css main.css"', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('cp lib/styles');
+                    done();
+                });
+            });
+        });
+    });
 
     describe('Fonts', function() {
         it('should create the build directory', function(done) {

@@ -26,8 +26,8 @@ scripts-dir        = scripts
 scripts-order      = main.js
 
 # Styles
-src-styles-dir     = $(src-dir)/styles
-src-styles-order   = main.styl
+styles-dir         = styles
+styles-order       = main.css
 
 # Fonts
 fonts-dir          = fonts
@@ -144,43 +144,33 @@ $(build-dir)/.js:
 # STYLES
 # ------------------------------------------------------------------------------
 
-src-styles    = $(addprefix $(src-styles-dir)/,$(src-styles-order))
-target-styles = $(build-dir)/$(target-name).css
-build-css-tmp = $(build-dir)/css-tmp
-tmp-css-files = $(addprefix $(build-css-tmp)/,$(addsuffix .css,$(src-styles-order)))
+fix-imports = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(styles-dir))\/\2\3/g"
 
-fix-imports   = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(src-styles-dir))\/\2\3/g"
-
-styles: $(cssmin) $(build-dir) $(target-styles)
+styles: $(build-dir)/$(target-name).css $(cssmin)
 
 #
-# Concatenate and compress intermediate CSS files
+# Concatenate and compress intermediate JS files
 #
-$(target-styles): $(tmp-css-files)
-ifeq ($(PRODUCTION),1)
+$(build-dir)/$(target-name).css: $(addprefix $(build-dir)/.css/,$(addsuffix .css,$(styles-order)))
 	$(cat) $+ | $(cssmin) > $@
-else
-	$(cat) $+ > $@
-endif
-	rm -rf $(build-css-tmp)
-
-#
-# Create directory for intermediate CSS files
-#
-$(build-css-tmp):
-	mkdir -p $@
 
 #
 # Copy source CSS files
 #
-$(build-css-tmp)/%.css.css: $(src-styles-dir)/%.css $(build-css-tmp)
-	$(cat) $< > $@
+$(build-dir)/.css/%.css.css: $(src-dir)/$(styles-dir)/%.css $(build-dir)/.css
+	cp $< $@
 
 #
 # Compile source Stylus files
 #
-$(build-css-tmp)/%.styl.css: $(src-styles-dir)/%.styl $(build-css-tmp) $(stylus)
+$(build-dir)/.css/%.styl.css: $(src-dir)/$(styles-dir)/%.styl $(build-dir)/.css $(stylus)
 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
+
+#
+# Create directory for intermediate JS files
+#
+$(build-dir)/.css:
+	mkdir -p $@
 
 
 
