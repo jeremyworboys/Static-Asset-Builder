@@ -19,6 +19,17 @@ describe('Makefile', function() {
                 done();
             });
         });
+
+        it('should not rebuild up-to-date rules', function(done) {
+            test('fonts', 'fonts', function(err, stdout) {
+                if (err) return done(err);
+                test(false, 'fonts', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('Nothing to be done');
+                    done();
+                });
+            });
+        });
     });
 
     beforeEach(function(done) {
@@ -34,9 +45,10 @@ describe('Makefile', function() {
 });
 
 function test(example, rule, done) {
-    exec([
-        'cp -r examples/'+example+' tmp/lib',
+    var cmd = [
         'cd tmp',
         'make '+rule
-    ].join(' && '), done);
+    ];
+    if (example) cmd.unshift('cp -r examples/'+example+' tmp/lib');
+    exec(cmd.join(' && '), done);
 }
