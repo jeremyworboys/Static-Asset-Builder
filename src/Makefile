@@ -22,8 +22,8 @@ src-dir            = lib
 build-dir          = build
 
 # Scripts
-src-scripts-dir    = $(src-dir)/scripts
-src-scripts-order  = main.js
+scripts-dir        = scripts
+scripts-order      = main.js
 
 # Styles
 src-styles-dir     = $(src-dir)/styles
@@ -118,36 +118,25 @@ $(jpegoptim):
 # SCRIPTS
 # ------------------------------------------------------------------------------
 
-src-scripts   = $(addprefix $(src-scripts-dir)/,$(src-scripts-order))
-target-script = $(build-dir)/$(target-name).js
-build-js-tmp  = $(build-dir)/.js
-tmp-js-files  = $(addprefix $(build-js-tmp)/,$(addsuffix .js,$(src-scripts-order)))
-
-scripts: $(uglifyjs) $(build-dir) $(target-script)
+scripts: $(build-dir)/$(target-name).js $(uglifyjs)
 
 #
 # Concatenate and compress intermediate JS files
 #
-$(target-script): $(tmp-js-files)
+$(build-dir)/$(target-name).js: $(addprefix $(build-dir)/.js/,$(addsuffix .js,$(basename $(scripts-order))))
 	$(uglifyjs) $+ $(uglify-opts) --output $@ --source-map $@.map --source-map-url /$@.map --source-map-root /
-
-#
-# Create directory for intermediate JS files
-#
-$(build-js-tmp):
-	mkdir -p $@
 
 #
 # Copy source JS files
 #
-$(build-js-tmp)/%.js.js: $(src-scripts-dir)/%.js $(build-js-tmp)
+$(build-dir)/.js/%.js: $(src-dir)/$(scripts-dir)/%.js $(build-dir)/.js
 	cp $< $@
 
 #
-# Compile source Coffeescript files
+# Create directory for intermediate JS files
 #
-# $(build-js-tmp)/%.styl.js: $(src-scripts-dir)/%.styl $(build-js-tmp) $(stylus)
-# 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
+$(build-dir)/.js:
+	mkdir -p $@
 
 
 

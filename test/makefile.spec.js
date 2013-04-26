@@ -14,7 +14,7 @@ describe('Makefile', function() {
         });
 
         it('should optimise scripts with uglify-js', function(done) {
-            test('scripts', 'scripts src-scripts-order="include.js main.js"', function(err, stdout) {
+            test('scripts', 'scripts scripts-order="include.js main.js"', function(err, stdout) {
                 if (err) return done(err);
                 stdout.should.include('uglifyjs build/.js/include.js build/.js/main.js  --output build/make.js');
                 done();
@@ -22,9 +22,9 @@ describe('Makefile', function() {
         });
 
         it('should not rebuild up-to-date rules', function(done) {
-            test('scripts', 'scripts src-scripts-order="include.js main.js"', function(err) {
+            test('scripts', 'scripts scripts-order="include.js main.js"', function(err) {
                 if (err) return done(err);
-                test(false, 'scripts src-scripts-order="include.js main.js"', function(err, stdout) {
+                test(false, 'scripts scripts-order="include.js main.js"', function(err, stdout) {
                     if (err) return done(err);
                     stdout.should.include('Nothing to be done');
                     done();
@@ -34,7 +34,7 @@ describe('Makefile', function() {
 
         describe('JavaScript', function(done) {
             it('should copy all files to the temp directory', function(done) {
-                test('scripts', 'scripts src-scripts-order="include.js main.js"', function(err, stdout) {
+                test('scripts', 'scripts scripts-order="include.js main.js"', function(err, stdout) {
                     if (err) return done(err);
                     stdout.should.include('cp lib/scripts/include.js build/.js/include.js');
                     stdout.should.include('cp lib/scripts/main.js build/.js/main.js');
