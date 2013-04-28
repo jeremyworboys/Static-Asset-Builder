@@ -203,9 +203,9 @@ describe('Makefile', function() {
             });
         });
 
-        describe('All', function() {
+        describe('Combination', function() {
             it('should copy all images to the build directory', function(done) {
-                test('images-all', 'images', function(err, stdout) {
+                test('images-combo', 'images', function(err, stdout) {
                     if (err) return done(err);
                     stdout.should.include('cp lib/images');
                     stdout.should.include('jpegoptim');
@@ -216,7 +216,7 @@ describe('Makefile', function() {
             });
 
             it('should not rebuild up-to-date rules', function(done) {
-                test('images-all', 'images', function(err) {
+                test('images-combo', 'images', function(err) {
                     if (err) return done(err);
                     test(false, 'images', function(err, stdout) {
                         if (err) return done(err);
