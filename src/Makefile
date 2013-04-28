@@ -38,6 +38,7 @@ images-dir         = images
 # Binary locations
 node_modules       = ./node_modules
 cat                = /bin/cat
+grep               = /usr/bin/grep
 uglifyjs           = $(node_modules)/.bin/uglifyjs
 coffee             = $(node_modules)/.bin/coffee
 lessc              = $(node_modules)/.bin/lessc
@@ -128,7 +129,7 @@ $(jpegoptim):
 # SCRIPTS
 # ------------------------------------------------------------------------------
 
-scripts: $(build-dir)/$(target-name).js $(uglifyjs)
+scripts: $(uglifyjs) $(build-dir)/$(target-name).js
 
 #
 # Concatenate and compress intermediate JS files
@@ -163,7 +164,7 @@ $(build-dir)/.js:
 
 fix-imports = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(src-dir)/$(styles-dir))\/\2\3/g"
 
-styles: $(build-dir)/$(target-name).css $(cssmin)
+styles: $(cssmin) $(build-dir)/$(target-name).css
 
 #
 # Concatenate and compress intermediate CSS files
@@ -186,7 +187,7 @@ $(build-dir)/.css/%.less.css: $(src-dir)/$(styles-dir)/%.less $(build-dir)/.css 
 #
 # Compile source Stylus files
 #
-$(build-dir)/.css/%.styl.css: $(src-dir)/$(styles-dir)/%.styl $(build-dir)/.css $(stylus)
+$(build-dir)/.css/%.styl.css: $(src-dir)/$(styles-dir)/%.styl $(build-dir)/.css $(stylus) $(nib)
 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
 
 #
@@ -234,7 +235,7 @@ $(build-dir)/$(images-dir)/%.png: $(src-dir)/$(images-dir)/%.png $(pngout) $(png
 # Optimise and compress JPG images
 #
 $(build-dir)/$(images-dir)/%.jpg: $(src-dir)/$(images-dir)/%.jpg $(jpegoptim) $(build-dir)/$(images-dir)
-	$(jpegoptim) $(jpegoptim-opts) -o -q -d $(build-dir)/$(images-dir) $<
+	$(jpegoptim) $(jpegoptim-opts) -o -q -d $(build-dir)/$(images-dir) $< | $(grep) "optimised" || cp $< $@
 
 #
 # Copy remaining source images into target directory
