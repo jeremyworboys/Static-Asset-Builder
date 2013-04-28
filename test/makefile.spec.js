@@ -41,6 +41,16 @@ describe('Makefile', function() {
                 });
             });
         });
+
+        describe('CoffeScript', function(done) {
+            it('should compile files to the temp directory', function(done) {
+                test('scripts-coffee', 'scripts scripts-order="include.coffee main.coffee"', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('coffee');
+                    done();
+                });
+            });
+        });
     });
 
     describe('Styles', function() {

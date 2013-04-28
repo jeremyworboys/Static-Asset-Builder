@@ -39,6 +39,7 @@ images-dir         = images
 node_modules       = ./node_modules
 cat                = /bin/cat
 uglifyjs           = $(node_modules)/.bin/uglifyjs
+coffee             = $(node_modules)/.bin/coffee
 lessc              = $(node_modules)/.bin/lessc
 stylus             = $(node_modules)/.bin/stylus
 nib                = $(node_modules)/nib/lib/nib.js
@@ -97,6 +98,9 @@ clean:
 $(uglifyjs):
 	npm install uglify-js
 
+$(coffee):
+	npm install coffee-script
+
 $(lessc):
 	npm install less
 
@@ -137,6 +141,13 @@ $(build-dir)/$(target-name).js: $(addprefix $(build-dir)/.js/,$(addsuffix .js,$(
 #
 $(build-dir)/.js/%.js.js: $(src-dir)/$(scripts-dir)/%.js $(build-dir)/.js
 	cp $< $@
+
+#
+# Compile source CoffeeScript files
+#
+$(build-dir)/.js/%.coffee.js: $(src-dir)/$(scripts-dir)/%.coffee $(build-dir)/.js $(coffee)
+	$(cat) $< | $(coffee) $(coffee-opts) --compile --stdio > $@
+
 
 #
 # Create directory for intermediate JS files
