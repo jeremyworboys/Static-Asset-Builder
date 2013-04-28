@@ -149,7 +149,7 @@ fix-imports = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(src-
 styles: $(build-dir)/$(target-name).css $(cssmin)
 
 #
-# Concatenate and compress intermediate JS files
+# Concatenate and compress intermediate CSS files
 #
 $(build-dir)/$(target-name).css: $(addprefix $(build-dir)/.css/,$(addsuffix .css,$(styles-order)))
 	$(cat) $+ | $(cssmin) > $@
@@ -167,7 +167,7 @@ $(build-dir)/.css/%.styl.css: $(src-dir)/$(styles-dir)/%.styl $(build-dir)/.css 
 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
 
 #
-# Create directory for intermediate JS files
+# Create directory for intermediate CSS files
 #
 $(build-dir)/.css:
 	mkdir -p $@
