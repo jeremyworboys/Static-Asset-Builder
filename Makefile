@@ -1,6 +1,6 @@
 
-MOCHA_OPTS=
-REPORTER=dot
+MOCHA_OPTS=--slow 1000
+REPORTER=spec
 
 # Run unit tests
 test:
