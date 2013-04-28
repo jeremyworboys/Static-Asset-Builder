@@ -92,6 +92,18 @@ describe('Makefile', function() {
                 });
             });
         });
+
+        describe('Combination', function(done) {
+            it('should fix imports and compile files to the temp directory', function(done) {
+                test('styles-combo', 'styles styles-order="include.css main.styl"', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('cp lib/styles');
+                    stdout.should.include('sed');
+                    stdout.should.include('stylus');
+                    done();
+                });
+            });
+        });
     });
 
     describe('Fonts', function() {
