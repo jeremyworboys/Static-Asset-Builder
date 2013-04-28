@@ -39,6 +39,7 @@ images-dir         = images
 node_modules       = ./node_modules
 cat                = /bin/cat
 uglifyjs           = $(node_modules)/.bin/uglifyjs
+lessc              = $(node_modules)/.bin/lessc
 stylus             = $(node_modules)/.bin/stylus
 nib                = $(node_modules)/nib/lib/nib.js
 cssmin             = $(node_modules)/.bin/cssmin
@@ -49,12 +50,14 @@ jpegoptim          = /usr/local/bin/jpegoptim
 # Build binary options
 ifeq ($(PRODUCTION),1)
 uglify-opts        = --mangle --compress
+lessc-opts         =
 stylus-opts        = --use $(nib) --import nib
 pngout-opts        = -s0 -n1 -f0
 pngnq-opts         = -s1
 jpegoptim-opts     = --strip-all
 else
 uglify-opts        =
+lessc-opts         =
 stylus-opts        = --use $(nib) --import nib
 pngout-opts        = -s3 -n1
 pngnq-opts         = -s10
@@ -93,6 +96,9 @@ clean:
 
 $(uglifyjs):
 	npm install uglify-js
+
+$(lessc):
+	npm install less
 
 $(stylus):
 	npm install stylus
@@ -159,6 +165,12 @@ $(build-dir)/$(target-name).css: $(addprefix $(build-dir)/.css/,$(addsuffix .css
 #
 $(build-dir)/.css/%.css.css: $(src-dir)/$(styles-dir)/%.css $(build-dir)/.css
 	cp $< $@
+
+#
+# Compile source Less files
+#
+$(build-dir)/.css/%.less.css: $(src-dir)/$(styles-dir)/%.less $(build-dir)/.css $(lessc)
+	$(cat) $< | $(fix-imports) | $(lessc) $(lessc-opts) - $@
 
 #
 # Compile source Stylus files

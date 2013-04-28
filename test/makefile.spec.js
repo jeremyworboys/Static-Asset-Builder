@@ -82,6 +82,17 @@ describe('Makefile', function() {
             });
         });
 
+        describe('Less', function(done) {
+            it('should fix imports and compile files to the temp directory', function(done) {
+                test('styles-less', 'styles styles-order="include.less main.less"', function(err, stdout) {
+                    if (err) return done(err);
+                    stdout.should.include('sed');
+                    stdout.should.include('lessc');
+                    done();
+                });
+            });
+        });
+
         describe('Stylus', function(done) {
             it('should fix imports and compile files to the temp directory', function(done) {
                 test('styles-stylus', 'styles styles-order="include.styl main.styl"', function(err, stdout) {
