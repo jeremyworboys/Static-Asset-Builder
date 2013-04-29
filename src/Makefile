@@ -13,7 +13,7 @@
 PRODUCTION         = 0
 
 # Output file-name
-target-name        = make
+target-name        = app
 
 # Path to the source directory relative to this file
 src-dir            = lib
