@@ -1,6 +1,9 @@
 
 # Static Asset Builder
 
+Easy to use compiler for static assets like CSS, JavaScript and images.
+
+
 ## Installation
 
 Copy `src/Makefile` into your project root.
@@ -18,15 +21,15 @@ $ curl -O https://raw.github.com/jeremyworboys/Static-Asset-Builder/master/src/M
 - Configure for your project. See *Variables*
 
 There are two build modes:
-- `$ make`: Will compile your CSS and JS and lightly optimise images.
-- `$ make PRODUCTION=1`: Will compile and compress your CSS and JS as well as heavily optimise images. Use this when you are getting ready to deploy as it can take a while to run.
+- `$ make`: Will compile your CSS and JavaScript and lightly optimise images.
+- `$ make PRODUCTION=1`: Will compile and compress your CSS and JavaScript as well as heavily optimise images. Use this when you are getting ready to deploy as it can take a while to run.
 
 If you have [`watch(1)`](https://github.com/visionmedia/watch) installed, you can run `watch -q make` to compile your assets as you work.
 
 
 ## Variables
 
-- `target-name`:   The name given to the built CSS and JS files. (Default `app`)
+- `target-name`:   The name given to the built CSS and JavaScript files. (Default `app`)
 - `src-dir`:       The directory containing the source files. (Default `lib`)
 - `build-dir`:     The directory to build the assets into. (Default `build`)
 - `scripts-dir`:   The directory within the `src-dir` that contains scripts. (Default `scripts`)
@@ -42,8 +45,8 @@ If you have [`watch(1)`](https://github.com/visionmedia/watch) installed, you ca
 - Quick and easy setup
 - CSS pre-processing (currently supports LESS and Stylus)
 - CSS concatenation and minification
-- JS pre-processing (currently supports CoffeeScript)
-- JS concatenation and minification with source-maps for debugging
+- JavaScript pre-processing (currently supports CoffeeScript)
+- JavaScript concatenation and minification with source-maps for debugging
 - Image optimisation and compression (currently supports `.png` and `.jpg`)
 - Only builds files that have changed since the last run (fast).
 
