@@ -1,7 +1,7 @@
 #
 # Static Asset Builder
 #
-# Version:   0.1.0
+# Version:   0.1.1
 # Author:    Jeremy Worboys <http://jeremyworboys.com>
 # Copyright: Copyright (c) 2013 Jeremy Worboys
 #
