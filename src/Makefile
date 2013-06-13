@@ -170,7 +170,11 @@ styles: $(cssmin) $(build-dir)/$(target-name).css
 # Concatenate and compress intermediate CSS files
 #
 $(build-dir)/$(target-name).css: $(addprefix $(build-dir)/.css/,$(addsuffix .css,$(styles-order)))
+ifeq ($(PRODUCTION),1)
 	$(cat) $+ | $(cssmin) > $@
+else
+	$(cat) $+ > $@
+endif
 
 #
 # Copy source CSS files
