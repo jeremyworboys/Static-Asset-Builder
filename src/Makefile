@@ -47,7 +47,7 @@ nib                = $(node_modules)/nib/lib/nib.js
 cssmin             = $(node_modules)/.bin/cssmin
 pngout             = /usr/local/bin/pngout
 pngnq              = /usr/local/bin/pngnq
-jpegoptim          = /usr/local/bin/jpegoptim
+imageoptim         = $(node_modules)/.bin/imageoptim-cli
 
 # Build binary options
 ifeq ($(PRODUCTION),1)
@@ -56,14 +56,14 @@ lessc-opts         =
 stylus-opts        = --use $(nib) --import nib
 pngout-opts        = -s0 -n1 -f0
 pngnq-opts         = -s1
-jpegoptim-opts     = --strip-all
+imageoptim-opts    = --jpeg-mini
 else
 uglify-opts        =
 lessc-opts         =
 stylus-opts        = --use $(nib) --import nib
 pngout-opts        = -s3 -n1
 pngnq-opts         = -s10
-jpegoptim-opts     =
+imageoptim-opts    = --jpeg-mini
 endif
 
 
@@ -120,8 +120,8 @@ $(pngout):
 $(pngnq):
 	brew install pngnq
 
-$(jpegoptim):
-	brew install jpegoptim
+$(imageoptim):
+	npm install -g imageoptim-cli
 
 
 
@@ -185,13 +185,13 @@ $(build-dir)/.css/%.css.css: $(src-dir)/$(styles-dir)/%.css $(build-dir)/.css
 #
 # Compile source Less files
 #
-$(build-dir)/.css/%.less.css: $(src-dir)/$(styles-dir)/%.less $(build-dir)/.css $(lessc)
+$(build-dir)/.css/%.less.css: $(src-dir)/$(styles-dir)/%.less $(src-dir)/$(styles-dir)/* $(build-dir)/.css $(lessc)
 	$(cat) $< | $(fix-imports) | $(lessc) $(lessc-opts) - $@
 
 #
 # Compile source Stylus files
 #
-$(build-dir)/.css/%.styl.css: $(src-dir)/$(styles-dir)/%.styl $(build-dir)/.css $(stylus) $(nib)
+$(build-dir)/.css/%.styl.css: $(src-dir)/$(styles-dir)/%.styl $(src-dir)/$(styles-dir)/* $(build-dir)/.css $(stylus) $(nib)
 	$(cat) $< | $(fix-imports) | $(stylus) $(stylus-opts) > $@
 
 #
@@ -238,8 +238,14 @@ $(build-dir)/$(images-dir)/%.png: $(src-dir)/$(images-dir)/%.png $(pngout) $(png
 #
 # Optimise and compress JPG images
 #
-$(build-dir)/$(images-dir)/%.jpg: $(src-dir)/$(images-dir)/%.jpg $(jpegoptim) $(build-dir)/$(images-dir)
-	$(jpegoptim) $(jpegoptim-opts) -o -q -d $(build-dir)/$(images-dir) $< | $(grep) "optimised" || cp $< $@
+$(build-dir)/$(images-dir)/%.jpg: $(src-dir)/$(images-dir)/%.jpg $(imageoptim) $(build-dir)/$(images-dir)
+	cp $< $@ && $(imageoptim) $(imageoptim-opts) $@
+
+#
+# Optimise and compress GIF images
+#
+$(build-dir)/$(images-dir)/%.gif: $(src-dir)/$(images-dir)/%.gif $(imageoptim) $(build-dir)/$(images-dir)
+	cp $< $@ && $(imageoptim) $(imageoptim-opts) $@
 
 #
 # Copy remaining source images into target directory
