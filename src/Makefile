@@ -41,6 +41,7 @@ cat                = /bin/cat
 grep               = /usr/bin/grep
 uglifyjs           = $(node_modules)/.bin/uglifyjs
 coffee             = $(node_modules)/.bin/coffee
+handlebars         = $(node_modules)/.bin/handlebars
 lessc              = $(node_modules)/.bin/lessc
 stylus             = $(node_modules)/.bin/stylus
 nib                = $(node_modules)/nib/lib/nib.js
@@ -52,6 +53,7 @@ imageoptim         = $(node_modules)/.bin/imageoptim-cli
 # Build binary options
 ifeq ($(PRODUCTION),1)
 uglify-opts        = --mangle --compress
+handlebars-opts    =
 lessc-opts         =
 stylus-opts        = --use $(nib) --import nib
 pngout-opts        = -s0 -n1 -f0
@@ -59,6 +61,7 @@ pngnq-opts         = -s1
 imageoptim-opts    = --jpeg-mini
 else
 uglify-opts        =
+handlebars-opts    =
 lessc-opts         =
 stylus-opts        = --use $(nib) --import nib
 pngout-opts        = -s3 -n1
@@ -101,6 +104,9 @@ $(uglifyjs):
 
 $(coffee):
 	npm install coffee-script
+
+$(handlebars):
+	npm install handlebars
 
 $(lessc):
 	npm install less
@@ -149,6 +155,11 @@ $(build-dir)/.js/%.js.js: $(src-dir)/$(scripts-dir)/%.js $(build-dir)/.js
 $(build-dir)/.js/%.coffee.js: $(src-dir)/$(scripts-dir)/%.coffee $(build-dir)/.js $(coffee)
 	$(cat) $< | $(coffee) $(coffee-opts) --compile --stdio > $@
 
+#
+# Compile source Handlebars templates
+#
+$(build-dir)/.js/%.hbs.js: $(src-dir)/$(scripts-dir)/%.hbs $(build-dir)/.js $(handlebars)
+	$(handlebars) $(handlebars-opts) --output $@ $<
 
 #
 # Create directory for intermediate JS files
