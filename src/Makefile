@@ -173,7 +173,7 @@ $(build-dir)/.js:
 # STYLES
 # ------------------------------------------------------------------------------
 
-fix-imports = sed -E "s/@import (['\"])(.*)(['\"])/@import \1$(subst /,\/,$(src-dir)/$(styles-dir))\/\2\3/g"
+fix-imports = sed -E "s/@import ('|\")([^\/].*)('|\")/@import \1$(subst /,\/,$(src-dir)/$(styles-dir))\/\2\3/g"
 
 styles: $(cssmin) $(build-dir)/$(target-name).css
 
